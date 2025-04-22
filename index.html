@@ -1,0 +1,1799 @@
+<!DOCTYPE html>
+<html lang="fr" dir="ltr" class="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FRETEASY - Comparez les prix d'envoi de colis</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --secondary: #10b981;
+            --accent: #f59e0b;
+            --dark: #1e293b;
+            --light: #f8fafc;
+        }
+        
+        [dir="rtl"] {
+            direction: rtl;
+        }
+        
+        .animate-float {
+            animation: float 3s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .tooltip:hover .tooltip-text {
+            visibility: visible;
+            opacity: 1;
+        }
+        
+        .step-active {
+            background-color: var(--primary);
+            color: white;
+        }
+        
+        .step-inactive {
+            background-color: #e2e8f0;
+            color: #64748b;
+        }
+        
+        .dark .step-inactive {
+            background-color: #334155;
+            color: #94a3b8;
+        }
+        
+        .dark {
+            --dark: #f8fafc;
+            --light: #1e293b;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800 dark:bg-gray-900 dark:text-gray-100 transition-colors duration-300">
+    <!-- Header -->
+    <header class="bg-white dark:bg-gray-800 shadow-sm sticky top-0 z-50">
+        <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="flex items-center space-x-2 rtl:space-x-reverse">
+                <div class="bg-indigo-600 text-white p-2 rounded-lg">
+                    <i class="fas fa-box text-xl"></i>
+                </div>
+                <h1 class="text-xl font-bold text-indigo-600 dark:text-indigo-400">FRETEASY</h1>
+                <span class="hidden md:inline text-sm text-gray-500 dark:text-gray-400">Comparez. Choisissez. Expédiez. Simplement.</span>
+            </div>
+            
+            <div class="flex items-center space-x-4 rtl:space-x-reverse">
+                <button id="theme-toggle" class="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700">
+                    <i class="fas fa-moon hidden dark:block"></i>
+                    <i class="fas fa-sun block dark:hidden"></i>
+                </button>
+                
+                <div class="relative">
+                    <select id="language-selector" class="bg-gray-100 dark:bg-gray-700 border-0 rounded-lg px-3 py-2 appearance-none focus:ring-2 focus:ring-indigo-500">
+                        <option value="fr">🇫🇷 Français</option>
+                        <option value="ar">🇲🇦 العربية</option>
+                        <option value="en">🇬🇧 English</option>
+                    </select>
+                    <div class="absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none">
+                        <i class="fas fa-chevron-down text-gray-500"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+ <!-- Hero Section -->
+<section class="bg-gradient-to-r from-indigo-500 to-purple-600 text-black py-12">
+    <div class="container mx-auto px-4 text-center">
+       <h2 class="text-3xl md:text-4xl text-white font-bold mb-4" data-i18n="hero_title">Envoyez vos colis au meilleur prix</h2>
+            <p class="text-lg md:text-xl text-white mb-8 max-w-2xl mx-auto" data-i18n="hero_subtitle">Comparez instantanément les prix de tous les transporteurs et économisez jusqu'à 60%</p>
+        
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 max-w-4xl mx-auto text-black">
+            <div class="flex flex-col md:flex-row gap-4">
+                <!-- From -->
+                <div class="flex-1">
+                    <label class="block text-gray-700 dark:text-gray-300 text-sm font-medium mb-1 text-left" data-i18n="from_label">De</label>
+                    <div class="relative">
+                        <input type="text" id="from-country" placeholder="Pays de départ" class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 text-black dark:text-white" autocomplete="off">
+                        <div id="from-country-suggestions" class="absolute z-10 mt-1 w-full bg-white dark:bg-gray-700 shadow-lg rounded-lg hidden text-black"></div>
+                    </div>
+                    <div class="relative mt-2">
+                        <input type="text" id="from-city" placeholder="Ville de départ" class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 text-black dark:text-white" autocomplete="off">
+                        <div id="from-city-suggestions" class="absolute z-10 mt-1 w-full bg-white dark:bg-gray-700 shadow-lg rounded-lg hidden text-black"></div>
+                    </div>
+                </div>
+                
+                <!-- Switch button -->
+                <div class="flex items-center justify-center mt-6 md:mt-0">
+                    <button id="switch-locations" class="bg-indigo-100 dark:bg-gray-600 p-2 rounded-full text-indigo-600 dark:text-indigo-300 hover:bg-indigo-200 dark:hover:bg-gray-500 transition-colors">
+                        <i class="fas fa-exchange-alt"></i>
+                    </button>
+                </div>
+                
+                <!-- To -->
+                <div class="flex-1">
+                    <label class="block text-gray-700 dark:text-gray-300 text-sm font-medium mb-1 text-left" data-i18n="to_label">À</label>
+                    <div class="relative">
+                        <input type="text" id="to-country" placeholder="Pays d'arrivée" class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 text-black dark:text-white" autocomplete="off">
+                        <div id="to-country-suggestions" class="absolute z-10 mt-1 w-full bg-white dark:bg-gray-700 shadow-lg rounded-lg hidden text-black"></div>
+                    </div>
+                    <div class="relative mt-2">
+                        <input type="text" id="to-city" placeholder="Ville d'arrivée" class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 text-black dark:text-white" autocomplete="off">
+                        <div id="to-city-suggestions" class="absolute z-10 mt-1 w-full bg-white dark:bg-gray-700 shadow-lg rounded-lg hidden text-black"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Package details -->
+            <div class="mt-4 grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                    <label class="block text-gray-700 dark:text-gray-300 text-sm font-medium mb-1 text-left" data-i18n="package_type">Type de marchandise</label>
+                    <select id="package-type" class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 text-black dark:text-white">
+                        <option value="" data-i18n="select_option">Sélectionnez</option>
+                        <option value="documents" data-i18n="documents">Documents</option>
+                        <option value="electronics" data-i18n="electronics">Électronique</option>
+                        <option value="clothes" data-i18n="clothes">Vêtements</option>
+                        <option value="fragile" data-i18n="fragile">Fragile</option>
+                        <option value="food" data-i18n="food">Nourriture</option>
+                        <option value="other" data-i18n="other">Autre</option>
+                    </select>
+                </div>
+                
+                <div>
+                    <label class="block text-gray-700 dark:text-gray-300 text-sm font-medium mb-1 text-left" data-i18n="weight_label">Poids (kg)</label>
+                    <div class="relative">
+                        <input type="number" id="package-weight" min="0.1" step="0.1" class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 text-black dark:text-white" placeholder="0.5">
+                        <div class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500">kg</div>
+                    </div>
+                </div>
+                
+                <div>
+                    <label class="block text-gray-700 dark:text-gray-300 text-sm font-medium mb-1 text-left" data-i18n="volume_label">Volume (optionnel)</label>
+                    <div class="flex items-center space-x-2 rtl:space-x-reverse">
+                        <input type="number" id="package-length" class="w-1/3 px-3 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 text-black dark:text-white" placeholder="L">
+                        <input type="number" id="package-width" class="w-1/3 px-3 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 text-black dark:text-white" placeholder="l">
+                        <input type="number" id="package-height" class="w-1/3 px-3 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 text-black dark:text-white" placeholder="H">
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mt-6">
+                <button id="search-button" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-6 rounded-lg transition-colors duration-300 flex items-center justify-center space-x-2 rtl:space-x-reverse">
+                    <i class="fas fa-search"></i>
+                    <span data-i18n="compare_button">Comparer les offres</span>
+                </button>
+            </div>
+        </div>
+    </div>
+</section>
+
+    <!-- Results Section (Initially hidden) -->
+    <section id="results-section" class="py-12 hidden">
+        <div class="container mx-auto px-4">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
+                <h2 class="text-2xl font-bold mb-4 md:mb-0" data-i18n="results_title">Résultats de votre recherche</h2>
+                
+                <div class="flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-4 rtl:md:space-x-reverse w-full md:w-auto">
+                    <div class="relative">
+                        <select id="sort-results" class="bg-gray-100 dark:bg-gray-700 border-0 rounded-lg px-4 py-2 appearance-none focus:ring-2 focus:ring-indigo-500 w-full md:w-auto">
+                            <option value="price-asc" data-i18n="sort_price_asc">Prix (croissant)</option>
+                            <option value="price-desc" data-i18n="sort_price_desc">Prix (décroissant)</option>
+                            <option value="duration-asc" data-i18n="sort_duration_asc">Durée (rapide)</option>
+                            <option value="duration-desc" data-i18n="sort_duration_desc">Durée (lente)</option>
+                        </select>
+                        <div class="absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none">
+                            <i class="fas fa-chevron-down text-gray-500"></i>
+                        </div>
+                    </div>
+                    
+                    <button id="filter-toggle" class="bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 px-4 py-2 rounded-lg flex items-center space-x-2 rtl:space-x-reverse">
+                        <i class="fas fa-filter"></i>
+                        <span data-i18n="filters_button">Filtres</span>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="flex flex-col md:flex-row gap-6">
+                <!-- Filters (Initially hidden on mobile) -->
+                <div id="filters-sidebar" class="hidden md:block w-full md:w-64 bg-white dark:bg-gray-800 p-4 rounded-lg shadow-md h-fit">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="font-semibold" data-i18n="filters_title">Filtres</h3>
+                        <button id="close-filters" class="md:hidden text-gray-500 hover:text-gray-700 dark:hover:text-gray-300">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                    
+                    <div class="space-y-4">
+                        <div>
+                            <label class="flex items-center space-x-2 rtl:space-x-reverse cursor-pointer">
+                                <input type="checkbox" id="filter-insurance" class="rounded text-indigo-600 focus:ring-indigo-500">
+                                <span data-i18n="filter_insurance">Avec assurance</span>
+                            </label>
+                        </div>
+                        
+                        <div>
+                            <h4 class="font-medium mb-2" data-i18n="transport_type">Type de transport</h4>
+                            <div class="space-y-2">
+                                <label class="flex items-center space-x-2 rtl:space-x-reverse cursor-pointer">
+                                    <input type="checkbox" id="filter-land" class="rounded text-indigo-600 focus:ring-indigo-500" checked>
+                                    <span data-i18n="transport_land">Terrestre</span>
+                                </label>
+                                <label class="flex items-center space-x-2 rtl:space-x-reverse cursor-pointer">
+                                    <input type="checkbox" id="filter-air" class="rounded text-indigo-600 focus:ring-indigo-500" checked>
+                                    <span data-i18n="transport_air">Aérien</span>
+                                </label>
+                                <label class="flex items-center space-x-2 rtl:space-x-reverse cursor-pointer">
+                                    <input type="checkbox" id="filter-sea" class="rounded text-indigo-600 focus:ring-indigo-500" checked>
+                                    <span data-i18n="transport_sea">Maritime</span>
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <h4 class="font-medium mb-2" data-i18n="carriers_title">Transporteurs</h4>
+                            <div class="space-y-2 max-h-48 overflow-y-auto">
+                                <!-- Will be populated dynamically -->
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <button id="apply-filters" class="w-full mt-4 bg-indigo-600 hover:bg-indigo-700 text-white py-2 px-4 rounded-lg transition-colors duration-300" data-i18n="apply_filters">
+                        Appliquer
+                    </button>
+                </div>
+                
+                <!-- Results Grid -->
+                <div class="flex-1">
+                    <div id="results-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <!-- Results will be inserted here dynamically -->
+                    </div>
+                    
+                    <div id="no-results" class="hidden text-center py-12">
+                        <i class="fas fa-box-open text-5xl text-gray-400 mb-4"></i>
+                        <h3 class="text-xl font-semibold mb-2" data-i18n="no_results_title">Aucun résultat trouvé</h3>
+                        <p class="text-gray-600 dark:text-gray-400 max-w-md mx-auto" data-i18n="no_results_desc">Essayez de modifier vos critères de recherche ou vos filtres pour trouver des offres correspondantes.</p>
+                    </div>
+                    
+                    <div id="loading-results" class="hidden text-center py-12">
+                        <div class="inline-block animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-600 mb-4"></div>
+                        <p class="text-gray-600 dark:text-gray-400" data-i18n="loading_results">Recherche des offres disponibles...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Booking Modal (Hidden by default) -->
+    <div id="booking-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+            <div class="p-6">
+                <div class="flex justify-between items-center mb-6">
+                    <h3 class="text-xl font-bold" data-i18n="booking_title">Réserver un envoi</h3>
+                    <button id="close-booking-modal" class="text-gray-500 hover:text-gray-700 dark:hover:text-gray-300">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                
+                <!-- Progress Steps -->
+                <div class="flex justify-between mb-8 relative">
+                    <div class="absolute top-1/2 left-0 right-0 h-1 bg-gray-200 dark:bg-gray-700 -z-10"></div>
+                    <div id="progress-bar" class="absolute top-1/2 left-0 h-1 bg-indigo-600 -z-10" style="width: 0%"></div>
+                    
+                    <div class="flex flex-col items-center">
+                        <div id="step1" class="step-active w-10 h-10 rounded-full flex items-center justify-center text-white font-bold mb-2">1</div>
+                        <span class="text-sm text-center" data-i18n="step1_booking">Méthode</span>
+                    </div>
+                    <div class="flex flex-col items-center">
+                        <div id="step2" class="step-inactive w-10 h-10 rounded-full flex items-center justify-center font-bold mb-2">2</div>
+                        <span class="text-sm text-center" data-i18n="step2_booking">Détails</span>
+                    </div>
+                    <div class="flex flex-col items-center">
+                        <div id="step3" class="step-inactive w-10 h-10 rounded-full flex items-center justify-center font-bold mb-2">3</div>
+                        <span class="text-sm text-center" data-i18n="step3_booking">Paiement</span>
+                    </div>
+                    <div class="flex flex-col items-center">
+                        <div id="step4" class="step-inactive w-10 h-10 rounded-full flex items-center justify-center font-bold mb-2">4</div>
+                        <span class="text-sm text-center" data-i18n="step4_booking">Confirmation</span>
+                    </div>
+                </div>
+                
+                <!-- Step 1: Delivery Method -->
+                <div id="step1-content" class="space-y-6">
+                    <h4 class="font-semibold" data-i18n="delivery_method">Choisissez votre méthode d'envoi</h4>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <button class="delivery-method-btn border-2 border-gray-200 dark:border-gray-700 rounded-xl p-4 hover:border-indigo-500 hover:bg-indigo-50 dark:hover:bg-gray-700 transition-all" data-method="dropoff">
+                            <div class="flex items-center space-x-3 rtl:space-x-reverse">
+                                <div class="bg-indigo-100 dark:bg-indigo-900 p-3 rounded-full">
+                                    <i class="fas fa-walking text-indigo-600 dark:text-indigo-300"></i>
+                                </div>
+                                <div class="text-left">
+                                    <h5 class="font-medium" data-i18n="dropoff_title">Je dépose moi-même</h5>
+                                    <p class="text-sm text-gray-500 dark:text-gray-400" data-i18n="dropoff_desc">Déposez votre colis dans un point relais</p>
+                                </div>
+                            </div>
+                        </button>
+                        
+                        <button class="delivery-method-btn border-2 border-gray-200 dark:border-gray-700 rounded-xl p-4 hover:border-indigo-500 hover:bg-indigo-50 dark:hover:bg-gray-700 transition-all" data-method="pickup">
+                            <div class="flex items-center space-x-3 rtl:space-x-reverse">
+                                <div class="bg-indigo-100 dark:bg-indigo-900 p-3 rounded-full">
+                                    <i class="fas fa-truck text-indigo-600 dark:text-indigo-300"></i>
+                                </div>
+                                <div class="text-left">
+                                    <h5 class="font-medium" data-i18n="pickup_title">Envoi d'un livreur</h5>
+                                    <p class="text-sm text-gray-500 dark:text-gray-400" data-i18n="pickup_desc">Un livreur vient chercher votre colis</p>
+                                </div>
+                            </div>
+                        </button>
+                    </div>
+                    
+                    <div class="flex justify-end pt-4">
+                        <button id="step1-next" class="bg-indigo-600 hover:bg-indigo-700 text-white py-2 px-6 rounded-lg transition-colors duration-300 disabled:opacity-50 disabled:cursor-not-allowed" disabled data-i18n="next_button">
+                            Suivant
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Step 2: Delivery Details -->
+                <div id="step2-content" class="hidden space-y-6">
+                    <h4 class="font-semibold" id="step2-title" data-i18n="delivery_details">Détails de l'envoi</h4>
+                    
+                    <!-- Dropoff Form (Initially hidden) -->
+                    <div id="dropoff-form" class="hidden space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium mb-1" data-i18n="dropoff_point">Point de dépôt</label>
+                            <select class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-white">
+                                <option value="" data-i18n="select_dropoff">Sélectionnez un point de dépôt</option>
+                                <option value="relais1">Relais Colis - Paris 10ème</option>
+                                <option value="relais2">Mondial Relay - Paris 18ème</option>
+                                <option value="relais3">UPS Access Point - Paris 15ème</option>
+                            </select>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium mb-1" data-i18n="dropoff_date">Date de dépôt</label>
+                            <input type="date" class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-white">
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium mb-1" data-i18n="id_document">Pièce d'identité</label>
+                            <div class="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-4 text-center cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors" id="id-upload-wrapper">
+                                <i class="fas fa-cloud-upload-alt text-gray-400 text-2xl mb-2"></i>
+                                <p class="text-sm text-gray-500 dark:text-gray-400" data-i18n="upload_id">Cliquez pour télécharger votre pièce d'identité</p>
+                                <input type="file" id="id-document" class="hidden" accept=".jpg,.jpeg,.png,.pdf" required>
+                            </div>
+                            
+                        </div>
+                    </div>
+                    <script>
+                        document.getElementById("id-upload-wrapper").addEventListener("click", function() {
+                            document.getElementById("id-document").click();
+                        });
+                        
+                        document.getElementById("id-document").addEventListener("change", function() {
+                            const file = this.files[0];
+                            if (file) {
+                                document.getElementById("step2-next").removeAttribute("disabled");
+                                document.getElementById("id-upload-wrapper").classList.add("bg-green-100");
+                            }
+                        });
+                        </script>
+                        
+                    
+                    <!-- Pickup Form (Initially hidden) -->
+                    <div id="pickup-form" class="hidden space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium mb-1" data-i18n="pickup_address">Adresse d'enlèvement</label>
+                            <input type="text" class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-white" placeholder="Adresse complète">
+                        </div>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium mb-1" data-i18n="pickup_date">Date d'enlèvement</label>
+                                <input type="date" class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-white">
+                            </div>
+                            
+                            <div>
+                                <label class="block text-sm font-medium mb-1" data-i18n="pickup_time">Heure</label>
+                                <select class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-white">
+                                    <option value="morning" data-i18n="morning_slot">Matin (8h-12h)</option>
+                                    <option value="afternoon" data-i18n="afternoon_slot">Après-midi (13h-17h)</option>
+                                    <option value="evening" data-i18n="evening_slot">Soirée (17h-20h)</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium mb-1" data-i18n="contact_person">Personne de contact</label>
+                            <input type="text" class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-white" placeholder="Nom complet">
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium mb-1" data-i18n="phone_number">Numéro de téléphone</label>
+                            <input type="tel" class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-white" placeholder="+33 6 12 34 56 78">
+                        </div>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium mb-1" data-i18n="floor_number">Étage</label>
+                                <input type="number" class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-white" placeholder="0">
+                            </div>
+                            
+                            <div>
+                                <label class="block text-sm font-medium mb-1" data-i18n="elevator">Ascenseur</label>
+                                <select class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-white">
+                                    <option value="yes" data-i18n="yes">Oui</option>
+                                    <option value="no" data-i18n="no">Non</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium mb-1" data-i18n="special_instructions">Instructions spéciales</label>
+                            <textarea class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-white" rows="2" placeholder="Code porte, accès difficile, etc."></textarea>
+                        </div>
+                    </div>
+                    
+                    <div class="flex justify-between pt-4">
+                        <button id="step2-back" class="bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-800 dark:text-white py-2 px-6 rounded-lg transition-colors duration-300" data-i18n="back_button">
+                            Retour
+                        </button>
+                        <button id="step2-next" class="bg-indigo-600 hover:bg-indigo-700 text-white py-2 px-6 rounded-lg transition-colors duration-300 disabled:opacity-50 disabled:cursor-not-allowed" disabled data-i18n="next_button">
+                            Suivant
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Step 3: Payment -->
+                <div id="step3-content" class="hidden space-y-6">
+                    <h4 class="font-semibold" data-i18n="payment_title">Paiement sécurisé</h4>
+                    
+                    <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
+                        <div class="flex justify-between items-center mb-4">
+                            <h5 class="font-medium" data-i18n="order_summary">Résumé de votre commande</h5>
+                            <span class="text-sm text-indigo-600 dark:text-indigo-400 cursor-pointer" data-i18n="edit_button">Modifier</span>
+                        </div>
+                        
+                        <div class="space-y-3">
+                            <div class="flex justify-between">
+                                <span class="text-gray-600 dark:text-gray-400" data-i18n="shipping_cost">Frais d'expédition</span>
+                                <span class="font-medium" id="shipping-cost">€25.99</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-600 dark:text-gray-400" data-i18n="insurance_cost">Assurance</span>
+                                <span class="font-medium" id="insurance-cost">€3.50</span>
+                            </div>
+                            <div class="flex justify-between border-t border-gray-200 dark:border-gray-600 pt-3">
+                                <span class="font-semibold" data-i18n="total_cost">Total</span>
+                                <span class="font-bold text-lg" id="total-cost">€29.49</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <h5 class="font-medium mb-2" data-i18n="payment_method">Méthode de paiement</h5>
+                        <div class="space-y-3">
+                            <label class="flex items-center space-x-3 rtl:space-x-reverse p-3 border border-gray-300 dark:border-gray-600 rounded-lg cursor-pointer hover:border-indigo-500 hover:bg-indigo-50 dark:hover:bg-gray-700 transition-all">
+                                <input type="radio" name="payment-method" value="card" class="text-indigo-600 focus:ring-indigo-500" checked>
+                                <div class="flex-1">
+                                    <div class="flex items-center space-x-2 rtl:space-x-reverse">
+                                        <i class="far fa-credit-card text-gray-600 dark:text-gray-400"></i>
+                                        <span data-i18n="credit_card">Carte de crédit</span>
+                                    </div>
+                                </div>
+                                <div class="flex space-x-2 rtl:space-x-reverse">
+                                    <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/visa/visa-original.svg" class="h-6" alt="Visa">
+                                    <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/mastercard/mastercard-original.svg" class="h-6" alt="Mastercard">
+                                </div>
+                            </label>
+                            
+                            <label class="flex items-center space-x-3 rtl:space-x-reverse p-3 border border-gray-300 dark:border-gray-600 rounded-lg cursor-pointer hover:border-indigo-500 hover:bg-indigo-50 dark:hover:bg-gray-700 transition-all">
+                                <input type="radio" name="payment-method" value="paypal" class="text-indigo-600 focus:ring-indigo-500">
+                                <div class="flex-1">
+                                    <div class="flex items-center space-x-2 rtl:space-x-reverse">
+                                        <i class="fab fa-paypal text-blue-500"></i>
+                                        <span>PayPal</span>
+                                    </div>
+                                </div>
+                                <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/paypal/paypal-original.svg" class="h-6" alt="PayPal">
+                            </label>
+                            
+                            <label class="flex items-center space-x-3 rtl:space-x-reverse p-3 border border-gray-300 dark:border-gray-600 rounded-lg cursor-pointer hover:border-indigo-500 hover:bg-indigo-50 dark:hover:bg-gray-700 transition-all">
+                                <input type="radio" name="payment-method" value="bank" class="text-indigo-600 focus:ring-indigo-500">
+                                <div class="flex-1">
+                                    <div class="flex items-center space-x-2 rtl:space-x-reverse">
+                                        <i class="fas fa-university text-gray-600 dark:text-gray-400"></i>
+                                        <span data-i18n="bank_transfer">Virement bancaire</span>
+                                    </div>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <!-- Credit Card Form (Shown by default) -->
+                    <div id="credit-card-form" class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium mb-1" data-i18n="card_number">Numéro de carte</label>
+                            <input type="text" class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-white" placeholder="1234 5678 9012 3456">
+                        </div>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium mb-1" data-i18n="expiry_date">Date d'expiration</label>
+                                <input type="text" class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-white" placeholder="MM/AA">
+                            </div>
+                            
+                            <div>
+                                <label class="block text-sm font-medium mb-1" data-i18n="security_code">Code de sécurité</label>
+                                <div class="relative">
+                                    <input type="text" class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-white" placeholder="CVC">
+                                    <div class="absolute right-3 top-1/2 transform -translate-y-1/2">
+                                        <div class="tooltip cursor-pointer">
+                                            <i class="fas fa-question-circle text-gray-400"></i>
+                                            <span class="tooltip-text absolute z-10 invisible opacity-0 bg-gray-800 text-white text-xs rounded py-1 px-2 right-0 bottom-full mb-2 w-32 transition-opacity duration-300" data-i18n="cvc_tooltip">3 chiffres au dos de votre carte</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium mb-1" data-i18n="card_name">Nom sur la carte</label>
+                            <input type="text" class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-white" placeholder="Nom complet">
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-start">
+                        <input type="checkbox" id="save-card" class="mt-1 rounded text-indigo-600 focus:ring-indigo-500">
+                        <label for="save-card" class="ml-2 block text-sm text-gray-600 dark:text-gray-400" data-i18n="save_card">Enregistrer cette carte pour des paiements plus rapides</label>
+                    </div>
+                    
+                    <div class="flex justify-between pt-4">
+                        <button id="step3-back" class="bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-800 dark:text-white py-2 px-6 rounded-lg transition-colors duration-300" data-i18n="back_button">
+                            Retour
+                        </button>
+                        <button id="step3-next" class="bg-indigo-600 hover:bg-indigo-700 text-white py-2 px-6 rounded-lg transition-colors duration-300" data-i18n="pay_button">
+                            Payer maintenant
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Step 4: Confirmation -->
+                <div id="step4-content" class="hidden text-center py-8">
+                    <div class="bg-green-100 dark:bg-green-900 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6">
+                        <i class="fas fa-check text-green-600 dark:text-green-300 text-3xl"></i>
+                    </div>
+                    
+                    <h4 class="text-xl font-bold mb-2" data-i18n="confirmation_title">Commande confirmée !</h4>
+                    <p class="text-gray-600 dark:text-gray-400 mb-6 max-w-md mx-auto" data-i18n="confirmation_message">Votre commande a été passée avec succès. Vous recevrez un email de confirmation avec les détails de votre envoi.</p>
+                    
+                    <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg max-w-md mx-auto text-left mb-6">
+                        <div class="flex justify-between items-center mb-3">
+                            <span class="font-medium" data-i18n="order_number">N° de commande</span>
+                            <span class="font-mono">FRTE-2023-5874</span>
+                        </div>
+                        <div class="flex justify-between items-center mb-3">
+                            <span class="font-medium" data-i18n="carrier_name">Transporteur</span>
+                            <span id="confirmed-carrier">FedEx Express</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="font-medium" data-i18n="estimated_delivery">Livraison estimée</span>
+                            <span id="confirmed-delivery">15 déc. 2023</span>
+                        </div>
+                    </div>
+                    
+                    <button id="step4-finish" class="bg-indigo-600 hover:bg-indigo-700 text-white py-2 px-8 rounded-lg transition-colors duration-300 inline-flex items-center space-x-2 rtl:space-x-reverse" data-i18n="track_order">
+                        <i class="fas fa-box-open"></i>
+                        <span>Suivre ma commande</span>
+                    </button>
+                    
+                    <div class="mt-6">
+                        <a href="#" class="text-indigo-600 dark:text-indigo-400 hover:underline inline-flex items-center space-x-1 rtl:space-x-reverse" data-i18n="new_shipment">
+                            <i class="fas fa-plus"></i>
+                            <span>Créer un nouvel envoi</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- FAQ Section -->
+    <section class="py-12 bg-white dark:bg-gray-800">
+        <div class="container mx-auto px-4">
+            <h2 class="text-2xl md:text-3xl font-bold text-center mb-8" data-i18n="faq_title">Questions fréquentes</h2>
+            
+            <div class="max-w-3xl mx-auto space-y-4">
+                <div class="border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
+                    <button class="faq-question w-full flex justify-between items-center p-4 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors text-left">
+                        <span class="font-medium" data-i18n="faq1_question">Comment fonctionne FRETEASY ?</span>
+                        <i class="fas fa-chevron-down transition-transform duration-300"></i>
+                    </button>
+                    <div class="faq-answer hidden px-4 pb-4 text-gray-600 dark:text-gray-400" data-i18n="faq1_answer">
+                        FRETEASY compare les prix de plusieurs transporteurs en temps réel. Il vous suffit de renseigner les détails de votre envoi, et notre plateforme vous montre toutes les options disponibles avec leurs prix et délais de livraison. Vous choisissez ensuite l'offre qui vous convient et réservez en quelques clics.
+                    </div>
+                </div>
+                
+                <div class="border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
+                    <button class="faq-question w-full flex justify-between items-center p-4 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors text-left">
+                        <span class="font-medium" data-i18n="faq2_question">Quels sont les pays desservis ?</span>
+                        <i class="fas fa-chevron-down transition-transform duration-300"></i>
+                    </button>
+                    <div class="faq-answer hidden px-4 pb-4 text-gray-600 dark:text-gray-400" data-i18n="faq2_answer">
+                        Nous proposons des services de livraison vers plus de 220 pays dans le monde. Que vous souhaitiez envoyer un colis en France, au Maroc, aux États-Unis ou ailleurs, nous avons des solutions adaptées à vos besoins.
+                    </div>
+                </div>
+                
+                <div class="border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
+                    <button class="faq-question w-full flex justify-between items-center p-4 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors text-left">
+                        <span class="font-medium" data-i18n="faq3_question">Comment sont calculés les prix ?</span>
+                        <i class="fas fa-chevron-down transition-transform duration-300"></i>
+                    </button>
+                    <div class="faq-answer hidden px-4 pb-4 text-gray-600 dark:text-gray-400" data-i18n="faq3_answer">
+                        Les prix sont calculés en fonction de plusieurs critères : poids et dimensions du colis, distance entre l'expéditeur et le destinataire, type de service (express, standard, économique) et options supplémentaires comme l'assurance. Notre algorithme compare en temps réel les tarifs de nos partenaires transporteurs pour vous offrir les meilleurs prix.
+                    </div>
+                </div>
+                
+                <div class="border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
+                    <button class="faq-question w-full flex justify-between items-center p-4 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors text-left">
+                        <span class="font-medium" data-i18n="faq4_question">Puis-je suivre mon colis ?</span>
+                        <i class="fas fa-chevron-down transition-transform duration-300"></i>
+                    </button>
+                    <div class="faq-answer hidden px-4 pb-4 text-gray-600 dark:text-gray-400" data-i18n="faq4_answer">
+                        Oui, dès que votre commande est confirmée, vous recevez un numéro de suivi par email. Vous pouvez suivre l'état de votre colis directement sur notre plateforme ou sur le site du transporteur choisi.
+                    </div>
+                </div>
+                
+                <div class="border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
+                    <button class="faq-question w-full flex justify-between items-center p-4 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors text-left">
+                        <span class="font-medium" data-i18n="faq5_question">Que faire en cas de problème ?</span>
+                        <i class="fas fa-chevron-down transition-transform duration-300"></i>
+                    </button>
+                    <div class="faq-answer hidden px-4 pb-4 text-gray-600 dark:text-gray-400" data-i18n="faq5_answer">
+                        Notre service client est disponible 7j/7 pour vous aider. En cas de retard, dommage ou perte de colis, contactez-nous via le chat en ligne ou par téléphone. Nous ferons le nécessaire avec le transporteur pour résoudre votre problème rapidement.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white py-12">
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div>
+                    <h3 class="text-lg font-semibold mb-4">FRETEASY</h3>
+                    <p class="text-gray-400" data-i18n="footer_desc">La solution simple et économique pour envoyer vos colis partout dans le monde.</p>
+                </div>
+                
+                <div>
+                    <h4 class="text-lg font-semibold mb-4" data-i18n="footer_links">Liens utiles</h4>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors" data-i18n="footer_home">Accueil</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors" data-i18n="footer_pricing">Tarifs</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors" data-i18n="footer_tracking">Suivi de colis</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors" data-i18n="footer_contact">Contact</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h4 class="text-lg font-semibold mb-4" data-i18n="footer_legal">Juridique</h4>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors" data-i18n="footer_terms">Conditions générales</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors" data-i18n="footer_privacy">Confidentialité</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors" data-i18n="footer_cookies">Cookies</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h4 class="text-lg font-semibold mb-4" data-i18n="footer_contact">Contactez-nous</h4>
+                    <ul class="space-y-2">
+                        <li class="flex items-center space-x-2 rtl:space-x-reverse">
+                            <i class="fas fa-phone text-gray-400"></i>
+                            <span class="text-gray-400">+212 12 34 56 78 90</span>
+                        </li>
+                        <li class="flex items-center space-x-2 rtl:space-x-reverse">
+                            <i class="fas fa-envelope text-gray-400"></i>
+                            <span class="text-gray-400">contact@freteasy.com</span>
+                        </li>
+                        <li class="flex items-center space-x-2 rtl:space-x-reverse">
+                            <i class="fas fa-map-marker-alt text-gray-400"></i>
+                            <span class="text-gray-400" data-i18n="footer_address">Maroc, Casablanca</span>
+                        </li>
+                    </ul>
+                    
+                    <div class="flex space-x-4 rtl:space-x-reverse mt-4">
+                        <a href="#" class="text-gray-400 hover:text-white transition-colors">
+                            <i class="fab fa-facebook-f"></i>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-white transition-colors">
+                            <i class="fab fa-twitter"></i>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-white transition-colors">
+                            <i class="fab fa-instagram"></i>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-white transition-colors">
+                            <i class="fab fa-linkedin-in"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="border-t border-gray-700 mt-8 pt-8 text-center text-gray-400">
+                <p data-i18n="footer_copyright">© 2025 FRETEASY. Tous droits réservés.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Sample data for demonstration
+        const sampleCarriers = [
+            {
+                id: 1,
+                name: "FedEx Express",
+                logo: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/fedora/fedora-original.svg",
+                price: 25.99,
+                duration: "2-3 jours",
+                type: "aérien",
+                insurance: true,
+                rating: 4.5
+            },
+            {
+                id: 2,
+                name: "UPS Standard",
+                logo: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/ubuntu/ubuntu-plain.svg",
+                price: 19.50,
+                duration: "3-5 jours",
+                type: "terrestre",
+                insurance: false,
+                rating: 4.2
+            },
+            {
+                id: 3,
+                name: "DHL Maritime",
+                logo: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/debian/debian-original.svg",
+                price: 15.75,
+                duration: "10-15 jours",
+                type: "maritime",
+                insurance: true,
+                rating: 4.0
+            },
+            {
+                id: 4,
+                name: "Chronopost",
+                logo: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/centos/centos-original.svg",
+                price: 29.99,
+                duration: "1-2 jours",
+                type: "aérien",
+                insurance: true,
+                rating: 4.7
+            },
+            {
+                id: 5,
+                name: "Mondial Relay",
+                logo: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/redhat/redhat-original.svg",
+                price: 12.30,
+                duration: "4-6 jours",
+                type: "terrestre",
+                insurance: false,
+                rating: 3.9
+            },
+            {
+                id: 6,
+                name: "Colissimo",
+                logo: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/linux/linux-original.svg",
+                price: 18.45,
+                duration: "3-4 jours",
+                type: "terrestre",
+                insurance: true,
+                rating: 4.1
+            }
+        ];
+
+        // Sample countries and cities
+        const countries = ["France", "Maroc", "Algérie", "Tunisie", "Espagne", "Belgique", "Allemagne", "États-Unis", "Canada", "Royaume-Uni"];
+        const cities = {
+            "France": ["Paris", "Lyon", "Marseille", "Toulouse", "Nice"],
+            "Maroc": ["Casablanca", "Rabat", "Marrakech", "Tanger", "Fès"],
+            "Algérie": ["Alger", "Oran", "Constantine", "Annaba", "Tlemcen"],
+            "Tunisie": ["Tunis", "Sfax", "Sousse", "Kairouan", "Bizerte"],
+            "Espagne": ["Madrid", "Barcelone", "Valence", "Séville", "Malaga"],
+            "Belgique": ["Bruxelles", "Anvers", "Liège", "Gand", "Charleroi"],
+            "Allemagne": ["Berlin", "Munich", "Francfort", "Hambourg", "Cologne"],
+            "États-Unis": ["New York", "Los Angeles", "Chicago", "Houston", "Miami"],
+            "Canada": ["Toronto", "Montréal", "Vancouver", "Calgary", "Ottawa"],
+            "Royaume-Uni": ["Londres", "Manchester", "Birmingham", "Liverpool", "Glasgow"]
+        };
+
+        // Current booking state
+        let currentBooking = {
+            carrier: null,
+            method: null,
+            details: {},
+            payment: {}
+        };
+
+        // DOM Elements
+        const themeToggle = document.getElementById('theme-toggle');
+        const languageSelector = document.getElementById('language-selector');
+        const searchButton = document.getElementById('search-button');
+        const resultsSection = document.getElementById('results-section');
+        const resultsContainer = document.getElementById('results-container');
+        const noResults = document.getElementById('no-results');
+        const loadingResults = document.getElementById('loading-results');
+        const sortResults = document.getElementById('sort-results');
+        const filterToggle = document.getElementById('filter-toggle');
+        const filtersSidebar = document.getElementById('filters-sidebar');
+        const closeFilters = document.getElementById('close-filters');
+        const filterInsurance = document.getElementById('filter-insurance');
+        const filterLand = document.getElementById('filter-land');
+        const filterAir = document.getElementById('filter-air');
+        const filterSea = document.getElementById('filter-sea');
+        const applyFilters = document.getElementById('apply-filters');
+        const bookingModal = document.getElementById('booking-modal');
+        const closeBookingModal = document.getElementById('close-booking-modal');
+        const deliveryMethodBtns = document.querySelectorAll('.delivery-method-btn');
+        const step1Next = document.getElementById('step1-next');
+        const step2Back = document.getElementById('step2-back');
+        const step2Next = document.getElementById('step2-next');
+        const step3Back = document.getElementById('step3-back');
+        const step3Next = document.getElementById('step3-next');
+        const step4Finish = document.getElementById('step4-finish');
+        const step1Content = document.getElementById('step1-content');
+        const step2Content = document.getElementById('step2-content');
+        const step3Content = document.getElementById('step3-content');
+        const step4Content = document.getElementById('step4-content');
+        const dropoffForm = document.getElementById('dropoff-form');
+        const pickupForm = document.getElementById('pickup-form');
+        const progressBar = document.getElementById('progress-bar');
+        const step1Indicator = document.getElementById('step1');
+        const step2Indicator = document.getElementById('step2');
+        const step3Indicator = document.getElementById('step3');
+        const step4Indicator = document.getElementById('step4');
+        const faqQuestions = document.querySelectorAll('.faq-question');
+        const switchLocations = document.getElementById('switch-locations');
+        const fromCountry = document.getElementById('from-country');
+        const fromCity = document.getElementById('from-city');
+        const toCountry = document.getElementById('to-country');
+        const toCity = document.getElementById('to-city');
+        const fromCountrySuggestions = document.getElementById('from-country-suggestions');
+        const fromCitySuggestions = document.getElementById('from-city-suggestions');
+        const toCountrySuggestions = document.getElementById('to-country-suggestions');
+        const toCitySuggestions = document.getElementById('to-city-suggestions');
+        const packageType = document.getElementById('package-type');
+        const packageWeight = document.getElementById('package-weight');
+        const packageLength = document.getElementById('package-length');
+        const packageWidth = document.getElementById('package-width');
+        const packageHeight = document.getElementById('package-height');
+
+        // Translations
+        const translations = {
+            fr: {
+                hero_title: "Envoyez vos colis au meilleur prix",
+                hero_subtitle: "Comparez instantanément les prix de tous les transporteurs et économisez jusqu'à 60%",
+                from_label: "De",
+                to_label: "À",
+                package_type: "Type de marchandise",
+                weight_label: "Poids (kg)",
+                volume_label: "Volume (optionnel)",
+                compare_button: "Comparer les offres",
+                how_it_works: "Comment ça marche ?",
+                step1_title: "Comparez",
+                step1_desc: "Renseignez les détails de votre envoi et comparez les prix en un clic",
+                step2_title: "Choisissez",
+                step2_desc: "Sélectionnez l'offre qui correspond à vos besoins et à votre budget",
+                step3_title: "Expédiez",
+                step3_desc: "Réservez en ligne et envoyez votre colis en toute sérénité",
+                results_title: "Résultats de votre recherche",
+                sort_price_asc: "Prix (croissant)",
+                sort_price_desc: "Prix (décroissant)",
+                sort_duration_asc: "Durée (rapide)",
+                sort_duration_desc: "Durée (lente)",
+                filters_button: "Filtres",
+                filters_title: "Filtres",
+                filter_insurance: "Avec assurance",
+                transport_type: "Type de transport",
+                transport_land: "Terrestre",
+                transport_air: "Aérien",
+                transport_sea: "Maritime",
+                carriers_title: "Transporteurs",
+                apply_filters: "Appliquer",
+                no_results_title: "Aucun résultat trouvé",
+                no_results_desc: "Essayez de modifier vos critères de recherche ou vos filtres pour trouver des offres correspondantes.",
+                loading_results: "Recherche des offres disponibles...",
+                booking_title: "Réserver un envoi",
+                delivery_method: "Choisissez votre méthode d'envoi",
+                dropoff_title: "Je dépose moi-même",
+                dropoff_desc: "Déposez votre colis dans un point relais",
+                pickup_title: "Envoi d'un livreur",
+                pickup_desc: "Un livreur vient chercher votre colis",
+                next_button: "Suivant",
+                delivery_details: "Détails de l'envoi",
+                dropoff_point: "Point de dépôt",
+                dropoff_date: "Date de dépôt",
+                id_document: "Pièce d'identité",
+                upload_id: "Cliquez pour télécharger votre pièce d'identité",
+                pickup_address: "Adresse d'enlèvement",
+                pickup_date: "Date d'enlèvement",
+                pickup_time: "Heure",
+                morning_slot: "Matin (8h-12h)",
+                afternoon_slot: "Après-midi (13h-17h)",
+                evening_slot: "Soirée (17h-20h)",
+                contact_person: "Personne de contact",
+                phone_number: "Numéro de téléphone",
+                floor_number: "Étage",
+                elevator: "Ascenseur",
+                yes: "Oui",
+                no: "Non",
+                special_instructions: "Instructions spéciales",
+                back_button: "Retour",
+                payment_title: "Paiement sécurisé",
+                order_summary: "Résumé de votre commande",
+                edit_button: "Modifier",
+                shipping_cost: "Frais d'expédition",
+                insurance_cost: "Assurance",
+                total_cost: "Total",
+                payment_method: "Méthode de paiement",
+                credit_card: "Carte de crédit",
+                bank_transfer: "Virement bancaire",
+                card_number: "Numéro de carte",
+                expiry_date: "Date d'expiration",
+                security_code: "Code de sécurité",
+                cvc_tooltip: "3 chiffres au dos de votre carte",
+                card_name: "Nom sur la carte",
+                save_card: "Enregistrer cette carte pour des paiements plus rapides",
+                pay_button: "Payer maintenant",
+                confirmation_title: "Commande confirmée !",
+                confirmation_message: "Votre commande a été passée avec succès. Vous recevrez un email de confirmation avec les détails de votre envoi.",
+                order_number: "N° de commande",
+                carrier_name: "Transporteur",
+                estimated_delivery: "Livraison estimée",
+                track_order: "Suivre ma commande",
+                new_shipment: "Créer un nouvel envoi",
+                faq_title: "Questions fréquentes",
+                faq1_question: "Comment fonctionne FRETEASY ?",
+                faq1_answer: "FRETEASY compare les prix de plusieurs transporteurs en temps réel. Il vous suffit de renseigner les détails de votre envoi, et notre plateforme vous montre toutes les options disponibles avec leurs prix et délais de livraison. Vous choisissez ensuite l'offre qui vous convient et réservez en quelques clics.",
+                faq2_question: "Quels sont les pays desservis ?",
+                faq2_answer: "Nous proposons des services de livraison vers plus de 220 pays dans le monde. Que vous souhaitiez envoyer un colis en France, au Maroc, aux États-Unis ou ailleurs, nous avons des solutions adaptées à vos besoins.",
+                faq3_question: "Comment sont calculés les prix ?",
+                faq3_answer: "Les prix sont calculés en fonction de plusieurs critères : poids et dimensions du colis, distance entre l'expéditeur et le destinataire, type de service (express, standard, économique) et options supplémentaires comme l'assurance. Notre algorithme compare en temps réel les tarifs de nos partenaires transporteurs pour vous offrir les meilleurs prix.",
+                faq4_question: "Puis-je suivre mon colis ?",
+                faq4_answer: "Oui, dès que votre commande est confirmée, vous recevez un numéro de suivi par email. Vous pouvez suivre l'état de votre colis directement sur notre plateforme ou sur le site du transporteur choisi.",
+                faq5_question: "Que faire en cas de problème ?",
+                faq5_answer: "Notre service client est disponible 7j/7 pour vous aider. En cas de retard, dommage ou perte de colis, contactez-nous via le chat en ligne ou par téléphone. Nous ferons le nécessaire avec le transporteur pour résoudre votre problème rapidement.",
+                footer_desc: "La solution simple et économique pour envoyer vos colis partout dans le monde.",
+                footer_links: "Liens utiles",
+                footer_home: "Accueil",
+                footer_pricing: "Tarifs",
+                footer_tracking: "Suivi de colis",
+                footer_contact: "Contact",
+                footer_legal: "Juridique",
+                footer_terms: "Conditions générales",
+                footer_privacy: "Confidentialité",
+                footer_cookies: "Cookies",
+                footer_address: "Paris, France",
+                footer_copyright: "© 2023 FRETEASY. Tous droits réservés.",
+                select_option: "Sélectionnez",
+                documents: "Documents",
+                electronics: "Électronique",
+                clothes: "Vêtements",
+                fragile: "Fragile",
+                food: "Nourriture",
+                other: "Autre",
+                select_dropoff: "Sélectionnez un point de dépôt"
+            },
+            ar: {
+                hero_title: "أرسل طرودك بأفضل سعر",
+                hero_subtitle: "قارن أسعار جميع شركات الشحن في الوقت الحقيقي ووفر حتى 60٪",
+                from_label: "من",
+                to_label: "إلى",
+                package_type: "نوع البضاعة",
+                weight_label: "الوزن (كجم)",
+                volume_label: "الحجم (اختياري)",
+                compare_button: "قارن العروض",
+                how_it_works: "كيف يعمل؟",
+                step1_title: "قارن",
+                step1_desc: "أدخل تفاصيل شحنتك وقارن الأسعار بنقرة واحدة",
+                step2_title: "اختر",
+                step2_desc: "حدد العرض الذي يناسب احتياجاتك وميزانيتك",
+                step3_title: "أرسل",
+                step3_desc: "احجز عبر الإنترنت وأرسل طردك بكل سهولة",
+                results_title: "نتائج البحث",
+                sort_price_asc: "السعر (من الأقل)",
+                sort_price_desc: "السعر (من الأعلى)",
+                sort_duration_asc: "المدة (الأسرع)",
+                sort_duration_desc: "المدة (الأبطأ)",
+                filters_button: "تصفية",
+                filters_title: "تصفية",
+                filter_insurance: "مع تأمين",
+                transport_type: "نوع النقل",
+                transport_land: "برّي",
+                transport_air: "جوي",
+                transport_sea: "بحري",
+                carriers_title: "شركات الشحن",
+                apply_filters: "تطبيق",
+                no_results_title: "لا توجد نتائج",
+                no_results_desc: "حاول تعديل معايير البحث أو الفلاتر للعثور على عروض مطابقة.",
+                loading_results: "جاري البحث عن العروض المتاحة...",
+                booking_title: "حجز شحنة",
+                delivery_method: "اختر طريقة الإرسال",
+                dropoff_title: "سأسلمها بنفسي",
+                dropoff_desc: "قم بتسليم الطرد في نقطة استلام",
+                pickup_title: "إرسال مندوب",
+                pickup_desc: "سيأتي مندوب لاستلام الطرد",
+                next_button: "التالي",
+                delivery_details: "تفاصيل الشحنة",
+                dropoff_point: "نقطة التسليم",
+                dropoff_date: "تاريخ التسليم",
+                id_document: "بطاقة الهوية",
+                upload_id: "انقر لتحميل بطاقة الهوية",
+                pickup_address: "عنوان الاستلام",
+                pickup_date: "تاريخ الاستلام",
+                pickup_time: "الوقت",
+                morning_slot: "الصباح (8 صباحًا - 12 ظهرًا)",
+                afternoon_slot: "بعد الظهر (1 - 5 مساءً)",
+                evening_slot: "المساء (5 - 8 مساءً)",
+                contact_person: "الشخص المسؤول",
+                phone_number: "رقم الهاتف",
+                floor_number: "الطابق",
+                elevator: "مصعد",
+                yes: "نعم",
+                no: "لا",
+                special_instructions: "تعليمات خاصة",
+                back_button: "رجوع",
+                payment_title: "دفع آمن",
+                order_summary: "ملخص الطلب",
+                edit_button: "تعديل",
+                shipping_cost: "تكلفة الشحن",
+                insurance_cost: "التأمين",
+                total_cost: "المجموع",
+                payment_method: "طريقة الدفع",
+                credit_card: "بطاقة ائتمان",
+                bank_transfer: "تحويل بنكي",
+                card_number: "رقم البطاقة",
+                expiry_date: "تاريخ الانتهاء",
+                security_code: "رمز الأمان",
+                cvc_tooltip: "3 أرقام على ظهر البطاقة",
+                card_name: "الاسم على البطاقة",
+                save_card: "حفظ البطاقة لدفعات أسرع",
+                pay_button: "ادفع الآن",
+                confirmation_title: "تم تأكيد الطلب!",
+                confirmation_message: "تم تقديم طلبك بنجاح. ستصلك رسالة تأكيد بالبريد الإلكتروني مع تفاصيل شحنتك.",
+                order_number: "رقم الطلب",
+                carrier_name: "شركة الشحن",
+                estimated_delivery: "موعد التسليم المتوقع",
+                track_order: "تتبع طلبي",
+                new_shipment: "إنشاء شحنة جديدة",
+                faq_title: "أسئلة شائعة",
+                faq1_question: "كيف يعمل FRETEASY؟",
+                faq1_answer: "يقارن FRETEASY أسعار عدة شركات شحن في الوقت الحقيقي. ما عليك سوى إدخال تفاصيل شحنتك، وستعرض منصتنا جميع الخيارات المتاحة مع أسعارها ومواعيد التسليم. ثم تختار العرض الذي يناسبك وتحجز ببضع نقرات.",
+                faq2_question: "ما هي البلدان المشمولة؟",
+                faq2_answer: "نقدم خدمات الشحن إلى أكثر من 220 دولة حول العالم. سواء كنت ترغب في إرسال طرد إلى فرنسا أو المغرب أو الولايات المتحدة أو أي مكان آخر، لدينا حلول تناسب احتياجاتك.",
+                faq3_question: "كيف يتم حساب الأسعار؟",
+                faq3_answer: "يتم حساب الأسعار بناءً على عدة معايير: وزن وأبعاد الطرد، المسافة بين المرسل والمستلم، نوع الخدمة (سريع، عادي، اقتصادي) وخيارات إضافية مثل التأمين. تقارن خوارزميتنا أسعار شركائنا من شركات الشحن في الوقت الحقيقي لتقديم أفضل الأسعار لك.",
+                faq4_question: "هل يمكنني تتبع طردي؟",
+                faq4_answer: "نعم، بمجرد تأكيد طلبك، ستتلقى رقم تتبع عبر البريد الإلكتروني. يمكنك تتبع حالة شحنتك مباشرة على منصتنا أو على موقع شركة الشحن المختارة.",
+                faq5_question: "ماذا أفعل في حالة وجود مشكلة؟",
+                faq5_answer: "خدمة العملاء لدينا متاحة 7 أيام في الأسبوع لمساعدتك. في حالة التأخير أو التلف أو فقدان الطرد، اتصل بنا عبر الدردشة عبر الإنترنت أو الهاتف. سنبذل قصارى جهدنا مع شركة الشحن لحل مشكلتك بسرعة.",
+                footer_desc: "الحل البسيط والاقتصادي لإرسال طرودك إلى أي مكان في العالم.",
+                footer_links: "روابط مفيدة",
+                footer_home: "الرئيسية",
+                footer_pricing: "الأسعار",
+                footer_tracking: "تتبع الطرود",
+                footer_contact: "اتصل بنا",
+                footer_legal: "قانوني",
+                footer_terms: "الشروط العامة",
+                footer_privacy: "الخصوصية",
+                footer_cookies: "الكوكيز",
+                footer_address: "باريس، فرنسا",
+                footer_copyright: "© 2023 FRETEASY. جميع الحقوق محفوظة.",
+                select_option: "اختر",
+                documents: "مستندات",
+                electronics: "إلكترونيات",
+                clothes: "ملابس",
+                fragile: "قابل للكسر",
+                food: "طعام",
+                other: "أخرى",
+                select_dropoff: "اختر نقطة تسليم"
+            },
+            en: {
+                hero_title: "Ship your packages at the best price",
+                hero_subtitle: "Instantly compare prices from all carriers and save up to 60%",
+                from_label: "From",
+                to_label: "To",
+                package_type: "Type of goods",
+                weight_label: "Weight (kg)",
+                volume_label: "Volume (optional)",
+                compare_button: "Compare offers",
+                how_it_works: "How it works?",
+                step1_title: "Compare",
+                step1_desc: "Enter your shipment details and compare prices with one click",
+                step2_title: "Choose",
+                step2_desc: "Select the offer that fits your needs and budget",
+                step3_title: "Ship",
+                step3_desc: "Book online and send your package with ease",
+                results_title: "Your search results",
+                sort_price_asc: "Price (low to high)",
+                sort_price_desc: "Price (high to low)",
+                sort_duration_asc: "Duration (fastest)",
+                sort_duration_desc: "Duration (slowest)",
+                filters_button: "Filters",
+                filters_title: "Filters",
+                filter_insurance: "With insurance",
+                transport_type: "Transport type",
+                transport_land: "Land",
+                transport_air: "Air",
+                transport_sea: "Sea",
+                carriers_title: "Carriers",
+                apply_filters: "Apply",
+                no_results_title: "No results found",
+                no_results_desc: "Try modifying your search criteria or filters to find matching offers.",
+                loading_results: "Searching for available offers...",
+                booking_title: "Book a shipment",
+                delivery_method: "Choose your shipping method",
+                dropoff_title: "I'll drop off myself",
+                dropoff_desc: "Drop off your package at a pickup point",
+                pickup_title: "Send a courier",
+                pickup_desc: "A courier will come to pick up your package",
+                next_button: "Next",
+                delivery_details: "Shipment details",
+                dropoff_point: "Drop-off point",
+                dropoff_date: "Drop-off date",
+                id_document: "ID document",
+                upload_id: "Click to upload your ID document",
+                pickup_address: "Pickup address",
+                pickup_date: "Pickup date",
+                pickup_time: "Time",
+                morning_slot: "Morning (8am-12pm)",
+                afternoon_slot: "Afternoon (1pm-5pm)",
+                evening_slot: "Evening (5pm-8pm)",
+                contact_person: "Contact person",
+                phone_number: "Phone number",
+                floor_number: "Floor",
+                elevator: "Elevator",
+                yes: "Yes",
+                no: "No",
+                special_instructions: "Special instructions",
+                back_button: "Back",
+                payment_title: "Secure payment",
+                order_summary: "Order summary",
+                edit_button: "Edit",
+                shipping_cost: "Shipping cost",
+                insurance_cost: "Insurance",
+                total_cost: "Total",
+                payment_method: "Payment method",
+                credit_card: "Credit card",
+                bank_transfer: "Bank transfer",
+                card_number: "Card number",
+                expiry_date: "Expiry date",
+                security_code: "Security code",
+                cvc_tooltip: "3 digits on the back of your card",
+                card_name: "Name on card",
+                save_card: "Save this card for faster payments",
+                pay_button: "Pay now",
+                confirmation_title: "Order confirmed!",
+                confirmation_message: "Your order has been successfully placed. You will receive a confirmation email with your shipment details.",
+                order_number: "Order number",
+                carrier_name: "Carrier",
+                estimated_delivery: "Estimated delivery",
+                track_order: "Track my order",
+                new_shipment: "Create new shipment",
+                faq_title: "Frequently asked questions",
+                faq1_question: "How does FRETEASY work?",
+                faq1_answer: "FRETEASY compares prices from multiple carriers in real time. Just enter your shipment details, and our platform will show you all available options with their prices and delivery times. You then choose the offer that suits you and book in a few clicks.",
+                faq2_question: "Which countries are served?",
+                faq2_answer: "We offer delivery services to over 220 countries worldwide. Whether you want to send a package to France, Morocco, the United States or elsewhere, we have solutions to meet your needs.",
+                faq3_question: "How are prices calculated?",
+                faq3_answer: "Prices are calculated based on several criteria: weight and dimensions of the package, distance between sender and recipient, type of service (express, standard, economy) and additional options such as insurance. Our algorithm compares our carrier partners' prices in real time to give you the best prices.",
+                faq4_question: "Can I track my package?",
+                faq4_answer: "Yes, as soon as your order is confirmed, you will receive a tracking number by email. You can track the status of your shipment directly on our platform or on the chosen carrier's website.",
+                faq5_question: "What should I do if there's a problem?",
+                faq5_answer: "Our customer service is available 7 days a week to help you. In case of delay, damage or loss of package, contact us via online chat or phone. We will do our best with the carrier to resolve your problem quickly.",
+                footer_desc: "The simple and economical solution to send your packages anywhere in the world.",
+                footer_links: "Useful links",
+                footer_home: "Home",
+                footer_pricing: "Pricing",
+                footer_tracking: "Package tracking",
+                footer_contact: "Contact",
+                footer_legal: "Legal",
+                footer_terms: "Terms and conditions",
+                footer_privacy: "Privacy",
+                footer_cookies: "Cookies",
+                footer_address: "Paris, France",
+                footer_copyright: "© 2023 FRETEASY. All rights reserved.",
+                select_option: "Select",
+                documents: "Documents",
+                electronics: "Electronics",
+                clothes: "Clothes",
+                fragile: "Fragile",
+                food: "Food",
+                other: "Other",
+                select_dropoff: "Select a drop-off point"
+            }
+        };
+
+        // Current language
+        let currentLanguage = 'fr';
+
+        // Initialize the page
+        document.addEventListener('DOMContentLoaded', function() {
+            // Theme toggle
+            themeToggle.addEventListener('click', function() {
+                document.documentElement.classList.toggle('dark');
+                localStorage.setItem('theme', document.documentElement.classList.contains('dark') ? 'dark' : 'light');
+            });
+
+            // Check for saved theme preference
+            if (localStorage.getItem('theme') === 'dark' || (!localStorage.getItem('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                document.documentElement.classList.add('dark');
+            }
+
+            // Language selector
+            languageSelector.addEventListener('change', function() {
+                currentLanguage = this.value;
+                updateLanguage(this.value);
+                
+                // Update direction for RTL languages
+                if (this.value === 'ar') {
+                    document.documentElement.dir = 'rtl';
+                } else {
+                    document.documentElement.dir = 'ltr';
+                }
+            });
+
+            // Search button
+            searchButton.addEventListener('click', function() {
+                if (validateSearchForm()) {
+                    showLoadingResults();
+                    setTimeout(showResults, 1500);
+                }
+            });
+
+            // Sort results
+            sortResults.addEventListener('change', function() {
+                sortAndDisplayResults();
+            });
+
+            // Filter toggle
+            filterToggle.addEventListener('click', function() {
+                filtersSidebar.classList.toggle('hidden');
+            });
+
+            // Close filters
+            closeFilters.addEventListener('click', function() {
+                filtersSidebar.classList.add('hidden');
+            });
+
+            // Apply filters
+            applyFilters.addEventListener('click', function() {
+                sortAndDisplayResults();
+                filtersSidebar.classList.add('hidden');
+            });
+
+            // FAQ questions
+            faqQuestions.forEach(question => {
+                question.addEventListener('click', function() {
+                    const answer = this.nextElementSibling;
+                    const icon = this.querySelector('i');
+                    
+                    answer.classList.toggle('hidden');
+                    icon.classList.toggle('rotate-180');
+                });
+            });
+
+            // Switch locations
+            switchLocations.addEventListener('click', function() {
+                const fromCountryValue = fromCountry.value;
+                const fromCityValue = fromCity.value;
+                
+                fromCountry.value = toCountry.value;
+                fromCity.value = toCity.value;
+                toCountry.value = fromCountryValue;
+                toCity.value = fromCityValue;
+            });
+
+            // Country and city suggestions
+            setupAutocomplete(fromCountry, fromCountrySuggestions, countries);
+            setupAutocomplete(toCountry, toCountrySuggestions, countries);
+            
+            fromCountry.addEventListener('input', function() {
+                if (this.value && cities[this.value]) {
+                    setupAutocomplete(fromCity, fromCitySuggestions, cities[this.value]);
+                } else {
+                    fromCitySuggestions.classList.add('hidden');
+                }
+            });
+            
+            toCountry.addEventListener('input', function() {
+                if (this.value && cities[this.value]) {
+                    setupAutocomplete(toCity, toCitySuggestions, cities[this.value]);
+                } else {
+                    toCitySuggestions.classList.add('hidden');
+                }
+            });
+
+            // Booking modal
+            document.querySelectorAll('.book-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const carrierId = parseInt(this.getAttribute('data-carrier-id'));
+                    const carrier = sampleCarriers.find(c => c.id === carrierId);
+                    
+                    if (carrier) {
+                        currentBooking.carrier = carrier;
+                        document.getElementById('confirmed-carrier').textContent = carrier.name;
+                        document.getElementById('confirmed-delivery').textContent = carrier.duration;
+                        document.getElementById('shipping-cost').textContent = `€${carrier.price.toFixed(2)}`;
+                        document.getElementById('insurance-cost').textContent = carrier.insurance ? '€3.50' : '€0.00';
+                        document.getElementById('total-cost').textContent = carrier.insurance ? `€${(carrier.price + 3.50).toFixed(2)}` : `€${carrier.price.toFixed(2)}`;
+                        
+                        bookingModal.classList.remove('hidden');
+                        document.body.style.overflow = 'hidden';
+                    }
+                });
+            });
+
+            // Close booking modal
+            closeBookingModal.addEventListener('click', function() {
+                bookingModal.classList.add('hidden');
+                document.body.style.overflow = 'auto';
+            });
+
+            // Delivery method selection
+            deliveryMethodBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    deliveryMethodBtns.forEach(b => {
+                        b.classList.remove('border-indigo-500', 'bg-indigo-50', 'dark:bg-gray-700');
+                        b.classList.add('border-gray-200', 'dark:border-gray-700');
+                    });
+                    
+                    this.classList.add('border-indigo-500', 'bg-indigo-50', 'dark:bg-gray-700');
+                    this.classList.remove('border-gray-200', 'dark:border-gray-700');
+                    
+                    currentBooking.method = this.getAttribute('data-method');
+                    step1Next.disabled = false;
+                });
+            });
+
+            // Step 1 next button
+            step1Next.addEventListener('click', function() {
+                step1Content.classList.add('hidden');
+                step2Content.classList.remove('hidden');
+                step2Back.classList.remove('hidden');
+                
+                if (currentBooking.method === 'dropoff') {
+                    dropoffForm.classList.remove('hidden');
+                    pickupForm.classList.add('hidden');
+                    document.querySelector('#step2-title').textContent = document.querySelector('[data-i18n="delivery_details"]').textContent;
+                } else {
+                    pickupForm.classList.remove('hidden');
+                    dropoffForm.classList.add('hidden');
+                    document.querySelector('#step2-title').textContent = document.querySelector('[data-i18n="delivery_details"]').textContent;
+                }
+                
+                step1Indicator.classList.remove('step-active');
+                step1Indicator.classList.add('step-inactive');
+                step2Indicator.classList.remove('step-inactive');
+                step2Indicator.classList.add('step-active');
+                progressBar.style.width = '33%';
+            });
+
+            // Step 2 back button
+            step2Back.addEventListener('click', function() {
+                step2Content.classList.add('hidden');
+                step1Content.classList.remove('hidden');
+                
+                step2Indicator.classList.remove('step-active');
+                step2Indicator.classList.add('step-inactive');
+                step1Indicator.classList.remove('step-inactive');
+                step1Indicator.classList.add('step-active');
+                progressBar.style.width = '0%';
+            });
+
+            // Step 2 next button
+            step2Next.addEventListener('click', function() {
+                step2Content.classList.add('hidden');
+                step3Content.classList.remove('hidden');
+                
+                step2Indicator.classList.remove('step-active');
+                step2Indicator.classList.add('step-inactive');
+                step3Indicator.classList.remove('step-inactive');
+                step3Indicator.classList.add('step-active');
+                progressBar.style.width = '66%';
+            });
+
+            // Step 3 back button
+            step3Back.addEventListener('click', function() {
+                step3Content.classList.add('hidden');
+                step2Content.classList.remove('hidden');
+                
+                step3Indicator.classList.remove('step-active');
+                step3Indicator.classList.add('step-inactive');
+                step2Indicator.classList.remove('step-inactive');
+                step2Indicator.classList.add('step-active');
+                progressBar.style.width = '33%';
+            });
+
+            // Step 3 next button
+            step3Next.addEventListener('click', function() {
+                step3Content.classList.add('hidden');
+                step4Content.classList.remove('hidden');
+                
+                step3Indicator.classList.remove('step-active');
+                step3Indicator.classList.add('step-inactive');
+                step4Indicator.classList.remove('step-inactive');
+                step4Indicator.classList.add('step-active');
+                progressBar.style.width = '100%';
+            });
+
+            // Step 4 finish button
+            step4Finish.addEventListener('click', function() {
+                bookingModal.classList.add('hidden');
+                document.body.style.overflow = 'auto';
+                
+                // Reset booking flow
+                setTimeout(() => {
+                    step4Content.classList.add('hidden');
+                    step1Content.classList.remove('hidden');
+                    
+                    step4Indicator.classList.remove('step-active');
+                    step4Indicator.classList.add('step-inactive');
+                    step1Indicator.classList.remove('step-inactive');
+                    step1Indicator.classList.add('step-active');
+                    progressBar.style.width = '0%';
+                    
+                    // Reset delivery method selection
+                    deliveryMethodBtns.forEach(b => {
+                        b.classList.remove('border-indigo-500', 'bg-indigo-50', 'dark:bg-gray-700');
+                        b.classList.add('border-gray-200', 'dark:border-gray-700');
+                    });
+                    
+                    step1Next.disabled = true;
+                    currentBooking.method = null;
+                }, 500);
+            });
+
+            // Initialize carrier filters
+            const carriersList = document.querySelector('#filters-sidebar .space-y-2');
+            sampleCarriers.forEach(carrier => {
+                const div = document.createElement('div');
+                div.className = 'flex items-center space-x-2 rtl:space-x-reverse';
+                div.innerHTML = `
+                    <input type="checkbox" id="filter-carrier-${carrier.id}" class="rounded text-indigo-600 focus:ring-indigo-500 carrier-filter" checked data-carrier-id="${carrier.id}">
+                    <label for="filter-carrier-${carrier.id}" class="cursor-pointer">${carrier.name}</label>
+                `;
+                carriersList.appendChild(div);
+            });
+
+            // Update all translations on page load
+            updateLanguage(currentLanguage);
+        });
+
+        // Validate search form
+        function validateSearchForm() {
+            let isValid = true;
+            
+            if (!fromCountry.value) {
+                isValid = false;
+                fromCountry.classList.add('border-red-500');
+            } else {
+                fromCountry.classList.remove('border-red-500');
+            }
+            
+            if (!fromCity.value) {
+                isValid = false;
+                fromCity.classList.add('border-red-500');
+            } else {
+                fromCity.classList.remove('border-red-500');
+            }
+            
+            if (!toCountry.value) {
+                isValid = false;
+                toCountry.classList.add('border-red-500');
+            } else {
+                toCountry.classList.remove('border-red-500');
+            }
+            
+            if (!toCity.value) {
+                isValid = false;
+                toCity.classList.add('border-red-500');
+            } else {
+                toCity.classList.remove('border-red-500');
+            }
+            
+            if (!packageType.value) {
+                isValid = false;
+                packageType.classList.add('border-red-500');
+            } else {
+                packageType.classList.remove('border-red-500');
+            }
+            
+            if (!packageWeight.value || parseFloat(packageWeight.value) <= 0) {
+                isValid = false;
+                packageWeight.classList.add('border-red-500');
+            } else {
+                packageWeight.classList.remove('border-red-500');
+            }
+            
+            return isValid;
+        }
+
+        // Show loading state for results
+        function showLoadingResults() {
+            resultsSection.classList.remove('hidden');
+            resultsContainer.classList.add('hidden');
+            noResults.classList.add('hidden');
+            loadingResults.classList.remove('hidden');
+        }
+
+        // Show results
+        function showResults() {
+            loadingResults.classList.add('hidden');
+            
+            if (sampleCarriers.length > 0) {
+                resultsContainer.classList.remove('hidden');
+                noResults.classList.add('hidden');
+                sortAndDisplayResults();
+            } else {
+                resultsContainer.classList.add('hidden');
+                noResults.classList.remove('hidden');
+            }
+        }
+
+        // Sort and display results based on selected filters
+        function sortAndDisplayResults() {
+            let filteredCarriers = [...sampleCarriers];
+            
+            // Apply insurance filter
+            if (filterInsurance.checked) {
+                filteredCarriers = filteredCarriers.filter(carrier => carrier.insurance);
+            }
+            
+            // Apply transport type filters
+            const transportFilters = [];
+            if (filterLand.checked) transportFilters.push('terrestre');
+            if (filterAir.checked) transportFilters.push('aérien');
+            if (filterSea.checked) transportFilters.push('maritime');
+            
+            if (transportFilters.length > 0) {
+                filteredCarriers = filteredCarriers.filter(carrier => transportFilters.includes(carrier.type));
+            }
+            
+            // Apply carrier filters
+            const selectedCarriers = [];
+            document.querySelectorAll('.carrier-filter:checked').forEach(checkbox => {
+                selectedCarriers.push(parseInt(checkbox.getAttribute('data-carrier-id')));
+            });
+            
+            if (selectedCarriers.length > 0) {
+                filteredCarriers = filteredCarriers.filter(carrier => selectedCarriers.includes(carrier.id));
+            }
+            
+            // Apply sorting
+            const sortValue = sortResults.value;
+            switch (sortValue) {
+                case 'price-asc':
+                    filteredCarriers.sort((a, b) => a.price - b.price);
+                    break;
+                case 'price-desc':
+                    filteredCarriers.sort((a, b) => b.price - a.price);
+                    break;
+                case 'duration-asc':
+                    // Extract numeric duration for sorting
+                    filteredCarriers.sort((a, b) => {
+                        const aDays = parseInt(a.duration.split('-')[0]);
+                        const bDays = parseInt(b.duration.split('-')[0]);
+                        return aDays - bDays;
+                    });
+                    break;
+                case 'duration-desc':
+                    filteredCarriers.sort((a, b) => {
+                        const aDays = parseInt(a.duration.split('-')[1]);
+                        const bDays = parseInt(b.duration.split('-')[1]);
+                        return bDays - aDays;
+                    });
+                    break;
+                default:
+                    break;
+            }
+            
+            // Display results
+            displayResults(filteredCarriers);
+        }
+
+        // Display results in the grid
+        function displayResults(carriers) {
+            resultsContainer.innerHTML = '';
+            
+            if (carriers.length === 0) {
+                resultsContainer.classList.add('hidden');
+                noResults.classList.remove('hidden');
+                return;
+            }
+            
+            carriers.forEach(carrier => {
+                const card = document.createElement('div');
+                card.className = 'bg-white dark:bg-gray-800 rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300 fade-in';
+                
+                // Generate star rating
+                const fullStars = Math.floor(carrier.rating);
+                const hasHalfStar = carrier.rating % 1 >= 0.5;
+                let starsHtml = '';
+                
+                for (let i = 0; i < fullStars; i++) {
+                    starsHtml += '<i class="fas fa-star text-yellow-400"></i>';
+                }
+                
+                if (hasHalfStar) {
+                    starsHtml += '<i class="fas fa-star-half-alt text-yellow-400"></i>';
+                }
+                
+                for (let i = 0; i < 5 - Math.ceil(carrier.rating); i++) {
+                    starsHtml += '<i class="far fa-star text-yellow-400"></i>';
+                }
+                
+                // Transport type icon
+                let transportIcon = '';
+                let transportColor = '';
+                
+                switch (carrier.type) {
+                    case 'terrestre':
+                        transportIcon = '<i class="fas fa-truck"></i>';
+                        transportColor = 'bg-blue-100 text-blue-600 dark:bg-blue-900 dark:text-blue-300';
+                        break;
+                    case 'aérien':
+                        transportIcon = '<i class="fas fa-plane"></i>';
+                        transportColor = 'bg-purple-100 text-purple-600 dark:bg-purple-900 dark:text-purple-300';
+                        break;
+                    case 'maritime':
+                        transportIcon = '<i class="fas fa-ship"></i>';
+                        transportColor = 'bg-green-100 text-green-600 dark:bg-green-900 dark:text-green-300';
+                        break;
+                }
+                
+                card.innerHTML = `
+                    <div class="p-6">
+                        <div class="flex items-start justify-between mb-4">
+                            <div class="flex items-center space-x-3 rtl:space-x-reverse">
+                                <img src="${carrier.logo}" alt="${carrier.name}" class="h-10 w-10 object-contain">
+                                <h3 class="font-semibold">${carrier.name}</h3>
+                            </div>
+                            <div class="${transportColor} p-2 rounded-lg">
+                                ${transportIcon}
+                            </div>
+                        </div>
+                        
+                        <div class="space-y-4">
+                            <div class="flex justify-between items-center">
+                                <span class="text-gray-500 dark:text-gray-400" data-i18n="estimated_delivery">Livraison estimée</span>
+                                <span class="font-medium">${carrier.duration}</span>
+                            </div>
+                            
+                            <div class="flex justify-between items-center">
+                                <span class="text-gray-500 dark:text-gray-400" data-i18n="price_label">Prix</span>
+                                <span class="text-2xl font-bold text-indigo-600 dark:text-indigo-400">€${carrier.price.toFixed(2)}</span>
+                            </div>
+                            
+                            <div class="flex justify-between items-center">
+                                <span class="text-gray-500 dark:text-gray-400" data-i18n="insurance_label">Assurance</span>
+                                <span class="font-medium">${carrier.insurance ? '<i class="fas fa-check text-green-500"></i>' : '<i class="fas fa-times text-red-500"></i>'}</span>
+                            </div>
+                            
+                            <div class="flex justify-between items-center">
+                                <span class="text-gray-500 dark:text-gray-400" data-i18n="rating_label">Évaluation</span>
+                                <div class="flex items-center space-x-1 rtl:space-x-reverse">
+                                    ${starsHtml}
+                                    <span class="text-sm">${carrier.rating.toFixed(1)}</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <button class="book-btn w-full mt-6 bg-indigo-600 hover:bg-indigo-700 text-white py-2 px-4 rounded-lg transition-colors duration-300" data-carrier-id="${carrier.id}" data-i18n="book_button">
+                            Réserver
+                        </button>
+                    </div>
+                `;
+                
+                resultsContainer.appendChild(card);
+            });
+            
+            // Re-attach event listeners to book buttons
+            document.querySelectorAll('.book-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const carrierId = parseInt(this.getAttribute('data-carrier-id'));
+                    const carrier = sampleCarriers.find(c => c.id === carrierId);
+                    
+                    if (carrier) {
+                        currentBooking.carrier = carrier;
+                        document.getElementById('confirmed-carrier').textContent = carrier.name;
+                        document.getElementById('confirmed-delivery').textContent = carrier.duration;
+                        document.getElementById('shipping-cost').textContent = `€${carrier.price.toFixed(2)}`;
+                        document.getElementById('insurance-cost').textContent = carrier.insurance ? '€3.50' : '€0.00';
+                        document.getElementById('total-cost').textContent = carrier.insurance ? `€${(carrier.price + 3.50).toFixed(2)}` : `€${carrier.price.toFixed(2)}`;
+                        
+                        bookingModal.classList.remove('hidden');
+                        document.body.style.overflow = 'hidden';
+                    }
+                });
+            });
+            
+            // Update translations for new elements
+            updateLanguage(currentLanguage);
+        }
+
+        // Update language
+        function updateLanguage(lang) {
+            currentLanguage = lang;
+            
+            // Update all elements with data-i18n attribute
+            document.querySelectorAll('[data-i18n]').forEach(element => {
+                const key = element.getAttribute('data-i18n');
+                if (translations[lang] && translations[lang][key]) {
+                    if (element.tagName === 'INPUT' && element.type === 'text' || element.tagName === 'INPUT' && element.type === 'number' || element.tagName === 'TEXTAREA') {
+                        element.placeholder = translations[lang][key];
+                    } else {
+                        element.textContent = translations[lang][key];
+                    }
+                }
+            });
+            
+            // Update select options
+            document.querySelectorAll('option[data-i18n]').forEach(option => {
+                const key = option.getAttribute('data-i18n');
+                if (translations[lang] && translations[lang][key]) {
+                    option.textContent = translations[lang][key];
+                }
+            });
+        }
+
+        // Setup autocomplete for country and city inputs
+        function setupAutocomplete(inputElement, suggestionsContainer, items) {
+            inputElement.addEventListener('input', function() {
+                const inputValue = this.value.toLowerCase();
+                const filteredItems = items.filter(item => 
+                    item.toLowerCase().includes(inputValue)
+                );
+                
+                if (filteredItems.length > 0 && inputValue.length > 0) {
+                    suggestionsContainer.innerHTML = '';
+                    filteredItems.slice(0, 5).forEach(item => {
+                        const div = document.createElement('div');
+                        div.className = 'px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 cursor-pointer';
+                        div.textContent = item;
+                        
+                        div.addEventListener('click', function() {
+                            inputElement.value = item;
+                            suggestionsContainer.classList.add('hidden');
+                        });
+                        
+                        suggestionsContainer.appendChild(div);
+                    });
+                    
+                    suggestionsContainer.classList.remove('hidden');
+                } else {
+                    suggestionsContainer.classList.add('hidden');
+                }
+            });
+            
+            // Hide suggestions when clicking outside
+            document.addEventListener('click', function(e) {
+                if (e.target !== inputElement) {
+                    suggestionsContainer.classList.add('hidden');
+                }
+            });
+        }
+    </script>
+</body>
+</html>
