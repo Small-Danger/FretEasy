@@ -5,7 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FRETEASY - Comparez les prix d'envoi de colis</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {}
+            }
+        }
+    </script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Tenor+Sans&display=swap" rel="stylesheet">
     <style>
         :root {
             --primary: #4f46e5;
@@ -61,17 +70,222 @@
             --dark: #f8fafc;
             --light: #1e293b;
         }
+        
+        body, html {
+            font-family: 'Tenor Sans', Arial, sans-serif;
+            background: #E5E5E5;
+            color: #1C1C1C;
+        }
+        h1, h2, h3, h4, h5, h6 {
+            color: #0056D2;
+            font-weight: bold;
+        }
+        .btn-primary {
+            background: #FF6A00;
+            color: #fff;
+            border-radius: 8px;
+            font-weight: bold;
+            transition: background 0.2s;
+        }
+        .btn-primary:hover {
+            background: #0056D2;
+            color: #fff;
+        }
+        a, .text-link {
+            color: #0056D2;
+        }
+        .bg-main {
+            background: #0056D2;
+        }
+        .text-orange {
+            color: #FF6A00;
+        }
+        .text-blue {
+            color: #0056D2;
+        }
+        .bg-orange {
+            background: #FF6A00;
+        }
+        .bg-light {
+            background: #E5E5E5;
+        }
+        /* Chatbot Flottant FRETEASY */
+        #freteasy-chatbot-btn {
+          position: fixed;
+          bottom: 32px;
+          right: 32px;
+          z-index: 1000;
+          background: #FF6A00;
+          color: #fff;
+          border-radius: 50%;
+          width: 72px;
+          height: 72px;
+          box-shadow: 0 8px 32px rgba(0,86,210,0.25), 0 0 0 4px #0056D2;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          cursor: pointer;
+          border: 3px solid #FF6A00;
+          transition: background 0.2s, box-shadow 0.2s, transform 0.2s;
+          animation: chatbot-pulse 1.5s infinite;
+        }
+        @keyframes chatbot-pulse {
+          0% { box-shadow: 0 8px 32px rgba(0,86,210,0.25), 0 0 0 4px #0056D2; }
+          50% { box-shadow: 0 8px 32px rgba(0,86,210,0.25), 0 0 0 12px #FF6A0044; }
+          100% { box-shadow: 0 8px 32px rgba(0,86,210,0.25), 0 0 0 4px #0056D2; }
+        }
+        #freteasy-chatbot-btn:hover {
+          background: #0056D2;
+          border-color: #0056D2;
+          transform: scale(1.08);
+        }
+        #freteasy-chatbot-badge {
+          position: absolute;
+          top: 8px;
+          right: -18px;
+          background: #0056D2;
+          color: #fff;
+          font-size: 0.85rem;
+          font-weight: bold;
+          border-radius: 12px;
+          padding: 2px 10px;
+          box-shadow: 0 2px 8px rgba(0,86,210,0.15);
+          pointer-events: none;
+          letter-spacing: 1px;
+        }
+        #freteasy-chatbot-window {
+          position: fixed;
+          bottom: 110px;
+          right: 32px;
+          width: 360px;
+          max-width: 95vw;
+          height: 480px;
+          background: #fff;
+          border-radius: 28px;
+          box-shadow: 0 12px 48px rgba(0,86,210,0.18), 0 2px 16px rgba(255,106,0,0.10);
+          display: none;
+          flex-direction: column;
+          overflow: hidden;
+          z-index: 1001;
+          font-family: 'Tenor Sans', Arial, sans-serif;
+          animation: chatbot-fadein 0.5s;
+        }
+        #freteasy-chatbot-window.active {
+          display: flex;
+          animation: chatbot-fadein 0.5s;
+        }
+        @keyframes chatbot-fadein {
+          from { opacity: 0; transform: translateY(40px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        #freteasy-chatbot-header {
+          background: #0056D2;
+          color: #fff;
+          padding: 22px 16px 16px 16px;
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          min-height: 64px;
+          box-shadow: 0 2px 8px #0056D222;
+        }
+        #freteasy-chatbot-header img {
+          height: 36px;
+          width: 36px;
+        }
+        #freteasy-chatbot-header span {
+          font-weight: bold;
+          font-size: 1.15rem;
+          letter-spacing: 1px;
+          display: flex;
+          align-items: center;
+          gap: 6px;
+        }
+        #freteasy-chatbot-header .fa-robot {
+          font-size: 1.3em;
+          color: #FF6A00;
+        }
+        #freteasy-chatbot-close {
+          margin-left: auto;
+          background: none;
+          border: none;
+          color: #fff;
+          font-size: 1.5rem;
+          cursor: pointer;
+        }
+        #freteasy-chatbot-messages {
+          flex: 1;
+          padding: 18px 16px 16px 16px;
+          background: #F6F8FA;
+          overflow-y: auto;
+          display: flex;
+          flex-direction: column;
+          gap: 12px;
+        }
+        .freteasy-bubble-bot {
+          align-self: flex-start;
+          background: #FF6A00;
+          color: #fff;
+          border-radius: 18px 18px 18px 6px;
+          padding: 12px 18px;
+          max-width: 80%;
+          font-size: 1.05rem;
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          box-shadow: 0 2px 8px #FF6A0033;
+        }
+        .freteasy-bubble-bot .fa-robot {
+          font-size: 1.2em;
+          color: #fff;
+          background: #0056D2;
+          border-radius: 50%;
+          padding: 4px;
+        }
+        .freteasy-bubble-user {
+          align-self: flex-end;
+          background: #0056D2;
+          color: #fff;
+          border-radius: 18px 18px 6px 18px;
+          padding: 12px 18px;
+          max-width: 80%;
+          font-size: 1.05rem;
+          box-shadow: 0 2px 8px #0056D233;
+        }
+        #freteasy-chatbot-input {
+          display: flex;
+          border-top: 1px solid #eee;
+          background: #fff;
+        }
+        #freteasy-chatbot-input input {
+          flex: 1;
+          border: none;
+          padding: 16px 12px;
+          font-size: 1rem;
+          outline: none;
+          font-family: 'Tenor Sans', Arial, sans-serif;
+        }
+        #freteasy-chatbot-input button {
+          background: #FF6A00;
+          color: #fff;
+          border: none;
+          padding: 0 20px;
+          font-size: 1.3rem;
+          border-radius: 0 0 18px 0;
+          cursor: pointer;
+          transition: background 0.2s;
+        }
+        #freteasy-chatbot-input button:hover {
+          background: #0056D2;
+        }
     </style>
 </head>
 <body class="bg-gray-50 text-gray-800 dark:bg-gray-900 dark:text-gray-100 transition-colors duration-300">
     <!-- Header -->
     <header class="bg-white dark:bg-gray-800 shadow-sm sticky top-0 z-50">
-        <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+        <div class="container mx-auto px-4 py-1 flex justify-between items-center">
             <div class="flex items-center space-x-2 rtl:space-x-reverse">
-                <div class="bg-indigo-600 text-white p-2 rounded-lg">
-                    <i class="fas fa-box text-xl"></i>
-                </div>
-                <h1 class="text-xl font-bold text-indigo-600 dark:text-indigo-400">FRETEASY</h1>
+                <img src="FRETEASY.png" alt="FRETEASY Logo" style="height:64px;width:auto;" class="mr-2">
+                <h1 class="text-xl font-bold text-blue-600"><span class="text-blue">FRET</span><span class="text-orange">EASY</span></h1>
                 <span class="hidden md:inline text-sm text-gray-500 dark:text-gray-400">Comparez. Choisissez. Expédiez. Simplement.</span>
             </div>
             
@@ -94,54 +308,53 @@
             </div>
         </div>
     </header>
+    <!-- Bannière d'annonces spéciales -->
+    <div class="w-full bg-orange-800 text-white flex items-center justify-center py-2 px-4 text-sm font-semibold" style="background:#FF6A00;">
+      <i class="fas fa-gift mr-2"></i>
+      <span>Offre spéciale : -10% sur tous les envois avec DHL cette semaine !</span>
+    </div>
 
  <!-- Hero Section -->
-<section class="bg-gradient-to-r from-indigo-500 to-purple-600 text-black py-12">
-    <div class="container mx-auto px-4 text-center">
-       <h2 class="text-3xl md:text-4xl text-white font-bold mb-4" data-i18n="hero_title">Envoyez vos colis au meilleur prix</h2>
-            <p class="text-lg md:text-xl text-white mb-8 max-w-2xl mx-auto" data-i18n="hero_subtitle">Comparez instantanément les prix de tous les transporteurs et économisez jusqu'à 60%</p>
+<section class="bg-gradient-to-r from-indigo-600 to-purple-700 text-white py-12 shadow-xl relative overflow-hidden">
+    <!-- Logo watermark -->
+    <img src="FRETEASY.png" alt="FRETEASY watermark" style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);opacity:0.07;width:60vw;max-width:600px;pointer-events:none;z-index:1;" />
+    <div class="container mx-auto px-4 text-center relative z-10">
+        <h2 class="text-2xl md:text-3xl font-bold text-indigo-100 mb-2 animate-float" data-i18n="hero_title">Envoyez vos colis au meilleur prix</h2>
+        <p class="text-base md:text-lg text-indigo-100 mb-3 max-w-2xl mx-auto" data-i18n="hero_subtitle">Comparez instantanément les prix de tous les transporteurs et économisez jusqu'à 60%</p>
         
-        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 max-w-4xl mx-auto text-black">
-            <div class="flex flex-col md:flex-row gap-4">
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-xl p-3 max-w-2xl mx-auto transform transition-transform duration-300">
+            <div class="flex flex-col md:flex-row gap-2">
                 <!-- From -->
                 <div class="flex-1">
-                    <label class="block text-gray-700 dark:text-gray-300 text-sm font-medium mb-1 text-left" data-i18n="from_label">De</label>
+                    <label class="block text-gray-700 dark:text-gray-300 text-xs font-medium mb-1 text-left" data-i18n="from_label">De</label>
                     <div class="relative">
-                        <input type="text" id="from-country" placeholder="Pays de départ" class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 text-black dark:text-white" autocomplete="off">
+                        <input type="text" id="from-country" placeholder="Pays de départ" class="w-full px-2 py-2 border border-gray-200 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 text-black dark:text-white text-sm" autocomplete="off">
                         <div id="from-country-suggestions" class="absolute z-10 mt-1 w-full bg-white dark:bg-gray-700 shadow-lg rounded-lg hidden text-black"></div>
-                    </div>
-                    <div class="relative mt-2">
-                        <input type="text" id="from-city" placeholder="Ville de départ" class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 text-black dark:text-white" autocomplete="off">
-                        <div id="from-city-suggestions" class="absolute z-10 mt-1 w-full bg-white dark:bg-gray-700 shadow-lg rounded-lg hidden text-black"></div>
                     </div>
                 </div>
                 
                 <!-- Switch button -->
-                <div class="flex items-center justify-center mt-6 md:mt-0">
-                    <button id="switch-locations" class="bg-indigo-100 dark:bg-gray-600 p-2 rounded-full text-indigo-600 dark:text-indigo-300 hover:bg-indigo-200 dark:hover:bg-gray-500 transition-colors">
-                        <i class="fas fa-exchange-alt"></i>
+                <div class="flex items-center justify-center mt-4 md:mt-0">
+                    <button id="switch-locations" class="bg-indigo-100 dark:bg-gray-600 p-2 rounded-full text-indigo-600 dark:text-indigo-300 hover:bg-indigo-200 dark:hover:bg-gray-500 transition-all duration-300">
+                        <i class="fas fa-exchange-alt text-base"></i>
                     </button>
                 </div>
                 
                 <!-- To -->
                 <div class="flex-1">
-                    <label class="block text-gray-700 dark:text-gray-300 text-sm font-medium mb-1 text-left" data-i18n="to_label">À</label>
+                    <label class="block text-gray-700 dark:text-gray-300 text-xs font-medium mb-1 text-left" data-i18n="to_label">À</label>
                     <div class="relative">
-                        <input type="text" id="to-country" placeholder="Pays d'arrivée" class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 text-black dark:text-white" autocomplete="off">
+                        <input type="text" id="to-country" placeholder="Pays d'arrivée" class="w-full px-2 py-2 border border-gray-200 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 text-black dark:text-white text-sm" autocomplete="off">
                         <div id="to-country-suggestions" class="absolute z-10 mt-1 w-full bg-white dark:bg-gray-700 shadow-lg rounded-lg hidden text-black"></div>
-                    </div>
-                    <div class="relative mt-2">
-                        <input type="text" id="to-city" placeholder="Ville d'arrivée" class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 text-black dark:text-white" autocomplete="off">
-                        <div id="to-city-suggestions" class="absolute z-10 mt-1 w-full bg-white dark:bg-gray-700 shadow-lg rounded-lg hidden text-black"></div>
                     </div>
                 </div>
             </div>
             
             <!-- Package details -->
-            <div class="mt-4 grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div class="mt-2 grid grid-cols-1 md:grid-cols-3 gap-2">
                 <div>
-                    <label class="block text-gray-700 dark:text-gray-300 text-sm font-medium mb-1 text-left" data-i18n="package_type">Type de marchandise</label>
-                    <select id="package-type" class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 text-black dark:text-white">
+                    <label class="block text-gray-700 dark:text-gray-300 text-xs font-medium mb-1 text-left" data-i18n="package_type">Type de marchandise</label>
+                    <select id="package-type" class="w-full px-2 py-2 border border-gray-200 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 text-black dark:text-white text-sm">
                         <option value="" data-i18n="select_option">Sélectionnez</option>
                         <option value="documents" data-i18n="documents">Documents</option>
                         <option value="electronics" data-i18n="electronics">Électronique</option>
@@ -153,26 +366,26 @@
                 </div>
                 
                 <div>
-                    <label class="block text-gray-700 dark:text-gray-300 text-sm font-medium mb-1 text-left" data-i18n="weight_label">Poids (kg)</label>
+                    <label class="block text-gray-700 dark:text-gray-300 text-xs font-medium mb-1 text-left" data-i18n="weight_label">Poids (kg)</label>
                     <div class="relative">
-                        <input type="number" id="package-weight" min="0.1" step="0.1" class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 text-black dark:text-white" placeholder="0.5">
-                        <div class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500">kg</div>
+                        <input type="number" id="package-weight" min="0.1" step="0.1" class="w-full px-2 py-2 border border-gray-200 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 text-black dark:text-white text-sm" placeholder="0.5">
+                        <div class="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-500 text-xs">kg</div>
                     </div>
                 </div>
                 
                 <div>
-                    <label class="block text-gray-700 dark:text-gray-300 text-sm font-medium mb-1 text-left" data-i18n="volume_label">Volume (optionnel)</label>
-                    <div class="flex items-center space-x-2 rtl:space-x-reverse">
-                        <input type="number" id="package-length" class="w-1/3 px-3 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 text-black dark:text-white" placeholder="L">
-                        <input type="number" id="package-width" class="w-1/3 px-3 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 text-black dark:text-white" placeholder="l">
-                        <input type="number" id="package-height" class="w-1/3 px-3 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 text-black dark:text-white" placeholder="H">
+                    <label class="block text-gray-700 dark:text-gray-300 text-xs font-medium mb-1 text-left" data-i18n="volume_label">Volume (optionnel)</label>
+                    <div class="flex items-center space-x-1 rtl:space-x-reverse">
+                        <input type="number" id="package-length" class="w-1/3 px-1 py-2 border border-gray-200 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 text-black dark:text-white text-xs" placeholder="L">
+                        <input type="number" id="package-width" class="w-1/3 px-1 py-2 border border-gray-200 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 text-black dark:text-white text-xs" placeholder="l">
+                        <input type="number" id="package-height" class="w-1/3 px-1 py-2 border border-gray-200 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 text-black dark:text-white text-xs" placeholder="H">
                     </div>
                 </div>
             </div>
             
-            <div class="mt-6">
-                <button id="search-button" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-6 rounded-lg transition-colors duration-300 flex items-center justify-center space-x-2 rtl:space-x-reverse">
-                    <i class="fas fa-search"></i>
+            <div class="mt-2">
+                <button id="search-button" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-lg transition-all duration-300 flex items-center justify-center space-x-2 rtl:space-x-reverse text-base transform hover:scale-[1.01] hover:shadow-lg">
+                    <i class="fas fa-search text-base"></i>
                     <span data-i18n="compare_button">Comparer les offres</span>
                 </button>
             </div>
@@ -670,6 +883,56 @@
         </div>
     </section>
 
+    <!-- Fin de la FAQ -->
+
+    <!-- Bannière coulissante logos compagnies -->
+    <div class="w-full bg-white py-4 shadow-inner">
+      <div class="relative max-w-5xl mx-auto">
+        <button id="slider-left" class="absolute left-0 top-1/2 -translate-y-1/2 bg-white border border-gray-200 rounded-full shadow p-2 z-10 hover:bg-gray-100" style="display:none;"><i class="fas fa-chevron-left text-blue-600"></i></button>
+        <div id="compagnies-slider" class="flex overflow-x-auto gap-8 px-12 scrollbar-hide" style="scroll-behavior:smooth;">
+          <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/fedora/fedora-original.svg" alt="FedEx" class="h-16 w-16 rounded-full bg-white shadow p-2 object-contain" title="FedEx Express">
+          <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/ubuntu/ubuntu-plain.svg" alt="UPS" class="h-16 w-16 rounded-full bg-white shadow p-2 object-contain" title="UPS Standard">
+          <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/debian/debian-original.svg" alt="DHL" class="h-16 w-16 rounded-full bg-white shadow p-2 object-contain" title="DHL Maritime">
+          <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/centos/centos-original.svg" alt="Chronopost" class="h-16 w-16 rounded-full bg-white shadow p-2 object-contain" title="Chronopost">
+          <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/redhat/redhat-original.svg" alt="Mondial Relay" class="h-16 w-16 rounded-full bg-white shadow p-2 object-contain" title="Mondial Relay">
+          <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/linux/linux-original.svg" alt="Colissimo" class="h-16 w-16 rounded-full bg-white shadow p-2 object-contain" title="Colissimo">
+        </div>
+        <button id="slider-right" class="absolute right-0 top-1/2 -translate-y-1/2 bg-white border border-gray-200 rounded-full shadow p-2 z-10 hover:bg-gray-100"><i class="fas fa-chevron-right text-blue-600"></i></button>
+      </div>
+    </div>
+    <style>
+    .scrollbar-hide::-webkit-scrollbar { display: none; }
+    .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+    <script>
+    const slider = document.getElementById('compagnies-slider');
+    const leftBtn = document.getElementById('slider-left');
+    const rightBtn = document.getElementById('slider-right');
+    function updateSliderButtons() {
+      leftBtn.style.display = slider.scrollLeft > 0 ? '' : 'none';
+      rightBtn.style.display = slider.scrollLeft + slider.clientWidth < slider.scrollWidth - 1 ? '' : 'none';
+    }
+    rightBtn.onclick = () => {
+      slider.scrollBy({left: 120, behavior: 'smooth'});
+      setTimeout(updateSliderButtons, 400);
+    };
+    leftBtn.onclick = () => {
+      slider.scrollBy({left: -120, behavior: 'smooth'});
+      setTimeout(updateSliderButtons, 400);
+    };
+    slider.addEventListener('scroll', updateSliderButtons);
+    window.addEventListener('resize', updateSliderButtons);
+    setTimeout(updateSliderButtons, 500);
+    // Auto défilement gauche vers droite
+    setInterval(() => {
+      if (slider.scrollLeft + slider.clientWidth >= slider.scrollWidth - 1) {
+        slider.scrollTo({left: 0, behavior: 'auto'});
+      } else {
+        slider.scrollBy({left: 2, behavior: 'auto'});
+      }
+    }, 20);
+    </script>
+
     <!-- Footer -->
     <footer class="bg-gray-800 text-white py-12">
         <div class="container mx-auto px-4">
@@ -737,6 +1000,58 @@
             </div>
         </div>
     </footer>
+
+    <!-- Bouton flottant -->
+    <button id="freteasy-chatbot-btn" aria-label="Ouvrir le chat FRETEASY">
+      <img src="FRETEASY.png" alt="Chatbot FRETEASY" style="height:38px;width:38px;">
+      <span id="freteasy-chatbot-badge">Aide</span>
+    </button>
+    <!-- Fenêtre du chatbot -->
+    <div id="freteasy-chatbot-window">
+      <div id="freteasy-chatbot-header">
+        <img src="FRETEASY.png" alt="FRETEASY Logo">
+        <span>Chatbot FRETEASY <i class="fas fa-robot"></i></span>
+        <button id="freteasy-chatbot-close" title="Fermer">&times;</button>
+      </div>
+      <div id="freteasy-chatbot-messages">
+        <div class="freteasy-bubble-bot"><i class="fas fa-robot"></i> Bonjour ! Je suis le chatbot FRETEASY, comment puis-je vous aider ?</div>
+      </div>
+      <form id="freteasy-chatbot-input" autocomplete="off">
+        <input type="text" placeholder="Écrivez votre question..." required>
+        <button type="submit"><i class="fas fa-paper-plane"></i></button>
+      </form>
+    </div>
+    <script>
+    // Ouverture/fermeture du chatbot
+    const btn = document.getElementById('freteasy-chatbot-btn');
+    const windowChat = document.getElementById('freteasy-chatbot-window');
+    const closeBtn = document.getElementById('freteasy-chatbot-close');
+    btn.onclick = () => windowChat.classList.toggle('active');
+    closeBtn.onclick = () => windowChat.classList.remove('active');
+    // Envoi de message utilisateur
+    const form = document.getElementById('freteasy-chatbot-input');
+    const input = form.querySelector('input');
+    const messages = document.getElementById('freteasy-chatbot-messages');
+    form.onsubmit = function(e) {
+      e.preventDefault();
+      const text = input.value.trim();
+      if (!text) return;
+      const userBubble = document.createElement('div');
+      userBubble.className = 'freteasy-bubble-user';
+      userBubble.textContent = text;
+      messages.appendChild(userBubble);
+      messages.scrollTop = messages.scrollHeight;
+      input.value = '';
+      // Réponse automatique simple (à personnaliser)
+      setTimeout(() => {
+        const botBubble = document.createElement('div');
+        botBubble.className = 'freteasy-bubble-bot';
+        botBubble.innerHTML = '<i class="fas fa-robot"></i> Merci pour votre question ! Un conseiller FRETEASY va vous répondre très vite.';
+        messages.appendChild(botBubble);
+        messages.scrollTop = messages.scrollHeight;
+      }, 800);
+    };
+    </script>
 
     <script>
         // Sample data for demonstration
@@ -1492,25 +1807,11 @@
                 fromCountry.classList.remove('border-red-500');
             }
             
-            if (!fromCity.value) {
-                isValid = false;
-                fromCity.classList.add('border-red-500');
-            } else {
-                fromCity.classList.remove('border-red-500');
-            }
-            
             if (!toCountry.value) {
                 isValid = false;
                 toCountry.classList.add('border-red-500');
             } else {
                 toCountry.classList.remove('border-red-500');
-            }
-            
-            if (!toCity.value) {
-                isValid = false;
-                toCity.classList.add('border-red-500');
-            } else {
-                toCity.classList.remove('border-red-500');
             }
             
             if (!packageType.value) {
